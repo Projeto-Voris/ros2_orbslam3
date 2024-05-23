@@ -10,7 +10,7 @@ MonocularSlamNode::MonocularSlamNode(ORB_SLAM3::System* pSLAM)
     m_SLAM = pSLAM;
     // std::cout << "slam changed" << std::endl;
     m_image_subscriber = this->create_subscription<ImageMsg>(
-        "camera",
+        "flir_camera/image_raw",
         10,
         std::bind(&MonocularSlamNode::GrabImage, this, std::placeholders::_1));
     std::cout << "slam changed" << std::endl;
@@ -20,9 +20,6 @@ MonocularSlamNode::~MonocularSlamNode()
 {
     // Stop all threads
     m_SLAM->Shutdown();
-
-    // Save camera trajectory
-    m_SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 }
 
 void MonocularSlamNode::GrabImage(const ImageMsg::SharedPtr msg)

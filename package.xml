@@ -4,7 +4,7 @@
   <name>ros2_orbslam3</name>
   <version>0.0.1</version>
   <description>ROS 2 wrapper for the ORB_SLAM3 library</description>
-  <maintainer email="alberto.soragna@gmail.com # 1691829677@qq.com">Alberto Soragna # curry chen</maintainer>
+  <maintainer email="alberto.soragna@gmail.com">Alberto Soragna</maintainer>
   <license>MIT</license>
   <author>Alberto Soragna # curry chen</author>
 
