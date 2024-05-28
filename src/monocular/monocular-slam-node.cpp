@@ -10,7 +10,7 @@ MonocularSlamNode::MonocularSlamNode(ORB_SLAM3::System* pSLAM)
     m_SLAM = pSLAM;
     // std::cout << "slam changed" << std::endl;
     m_image_subscriber = this->create_subscription<ImageMsg>(
-        "flir_camera/image_raw",
+        "sync_camera/image",
         10,
         std::bind(&MonocularSlamNode::GrabImage, this, std::placeholders::_1));
     std::cout << "slam changed" << std::endl;
@@ -28,13 +28,14 @@ void MonocularSlamNode::GrabImage(const ImageMsg::SharedPtr msg)
     try
     {
         m_cvImPtr = cv_bridge::toCvCopy(msg);
+        
+        cv::resize(m_cvImPtr->image, resize, cv::Size(), 0.5,0.5);
     }
     catch (cv_bridge::Exception& e)
     {
         RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
         return;
     }
-   
-    std::cout<<"one frame has been sent"<<std::endl; 
-    m_SLAM->TrackMonocular(m_cvImPtr->image, msg->header.stamp.sec);
+    Sophus::SE3f SE3 = m_SLAM->TrackMonocular(resize, static_cast<double>(msg->header.stamp.sec) + static_cast<double>(msg->header.stamp.nanosec) * 1e-9);
+    std::cout<<static_cast<double>(msg->header.stamp.sec) + static_cast<double>(msg->header.stamp.nanosec) * 1e-9<<std::endl;
 }

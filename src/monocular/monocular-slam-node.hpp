@@ -27,6 +27,7 @@ private:
     ORB_SLAM3::System* m_SLAM;
 
     cv_bridge::CvImagePtr m_cvImPtr;
+    cv::Mat resize;
 
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr m_image_subscriber;
 };
