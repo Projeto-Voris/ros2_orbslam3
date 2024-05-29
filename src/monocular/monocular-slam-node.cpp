@@ -29,13 +29,15 @@ void MonocularSlamNode::GrabImage(const ImageMsg::SharedPtr msg)
     {
         m_cvImPtr = cv_bridge::toCvCopy(msg);
         
-        cv::resize(m_cvImPtr->image, resize, cv::Size(), 0.5,0.5);
+        cv::resize(m_cvImPtr->image, resize, cv::Size(), 0.5, 0.5);
     }
     catch (cv_bridge::Exception& e)
     {
         RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
         return;
     }
+
     Sophus::SE3f SE3 = m_SLAM->TrackMonocular(resize, static_cast<double>(msg->header.stamp.sec) + static_cast<double>(msg->header.stamp.nanosec) * 1e-9);
-    std::cout<<static_cast<double>(msg->header.stamp.sec) + static_cast<double>(msg->header.stamp.nanosec) * 1e-9<<std::endl;
+    //std::cout<<std::setprecision (15)<<static_cast<double>(msg->header.stamp.sec) + static_cast<double>(msg->header.stamp.nanosec) * 1e-9<<std::endl;
+    std::cout<< SE3.matrix()<< std::endl;
 }

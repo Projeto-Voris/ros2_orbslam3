@@ -30,14 +30,14 @@ Camera1.k2: 0.07395907
 Camera1.p1: 0.00019359
 Camera1.p2: 1.76187114e-05
 
-Camera.width: 752
-Camera.height: 480
+Camera.width: 800
+Camera.height: 600
 
 Camera.newWidth: 800
 Camera.newHeight: 600
 
 # Camera frames per second 
-Camera.fps: 5
+Camera.fps: 20
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
