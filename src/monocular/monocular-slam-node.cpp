@@ -43,6 +43,7 @@ void MonocularSlamNode::GrabImage(const ImageMsg::SharedPtr msg)
     //std::cout<<std::setprecision (15)<<static_cast<double>(msg->header.stamp.sec) + static_cast<double>(msg->header.stamp.nanosec) * 1e-9<<std::endl;
     sendmsg.header.stamp = this->get_clock()->now();
     sendmsg.header.frame_id = "map";
+
     sendmsg.pose.position.x = SE3.params()(4);
     sendmsg.pose.position.y = SE3.params()(5);
     sendmsg.pose.position.z = SE3.params()(6);
@@ -53,7 +54,7 @@ void MonocularSlamNode::GrabImage(const ImageMsg::SharedPtr msg)
     sendmsg.pose.orientation.w = SE3.params()(3);
 
     publisher->publish(sendmsg);
-    std::cout<<"Parameter:"<< SE3.params()(1)<< std::endl;
+    std::cout<<"Parameter:"<< SE3.angleX()<< std::endl;
 
 
 }
