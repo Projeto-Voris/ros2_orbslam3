@@ -91,6 +91,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
   
 
     cv::Mat imLeft, imRight;
+    auto sendmsg = geometry_msgs::msg::PoseStamped();
     /*cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
     cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);*/
 
