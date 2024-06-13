@@ -100,13 +100,13 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     sendmsg.header.stamp = this->get_clock()->now();
     sendmsg.header.frame_id = "map";
 
-    sendmsg.pose.position.x = SE3.params()(4);
-    sendmsg.pose.position.y = SE3.params()(5);
-    sendmsg.pose.position.z = SE3.params()(6);
+    sendmsg.pose.position.x = -SE3.params()(4);
+    sendmsg.pose.position.y = -SE3.params()(6);
+    sendmsg.pose.position.z = SE3.params()(5);
 
-    sendmsg.pose.orientation.x = SE3.params()(0);
-    sendmsg.pose.orientation.y = SE3.params()(1);
-    sendmsg.pose.orientation.z = SE3.params()(2);
+    sendmsg.pose.orientation.x = -SE3.params()(0);
+    sendmsg.pose.orientation.y = -SE3.params()(2);
+    sendmsg.pose.orientation.z = SE3.params()(1);
     sendmsg.pose.orientation.w = SE3.params()(3);
 
     publisher->publish(sendmsg);
