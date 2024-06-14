@@ -45,6 +45,9 @@ Camera2.p2: -7.8944e-05
 Camera.width: 1600
 Camera.height: 1200
 
+Camera.newWidth: 800
+Camera.newHeight: 600
+
 # Camera frames per second 
 Camera.fps: 20
 
