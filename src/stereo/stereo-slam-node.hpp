@@ -3,6 +3,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 
 #include "message_filters/subscriber.h"
 #include "message_filters/synchronizer.h"
@@ -41,6 +43,7 @@ private:
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > right_sub;
 
     std::shared_ptr<message_filters::Synchronizer<approximate_sync_policy> > syncApproximate;
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher;
 };
 
 #endif

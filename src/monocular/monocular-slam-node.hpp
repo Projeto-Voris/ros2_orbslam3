@@ -3,6 +3,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 
 #include <cv_bridge/cv_bridge.h>
 
@@ -21,6 +23,7 @@ public:
 
 private:
     using ImageMsg = sensor_msgs::msg::Image;
+    using PoseMsg = geometry_msgs::msg::PoseStamped;
 
     void GrabImage(const sensor_msgs::msg::Image::SharedPtr msg);
 
@@ -30,5 +33,6 @@ private:
     cv::Mat resize;
 
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr m_image_subscriber;
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher;
 };
 
