@@ -110,8 +110,8 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     sendmsg.pose.orientation.z = SE3.params()(1);
     sendmsg.pose.orientation.w = SE3.params()(3);
 
-    
-    RCLCPP_INFO(this->get_logger(), "x: %s", points[0]->GetWorldPos()(0));
+    if(!points.empty())
+        std::cout << points[0]->GetWorldPos()(0) << std::endl;
 
     publisher->publish(sendmsg);
    
