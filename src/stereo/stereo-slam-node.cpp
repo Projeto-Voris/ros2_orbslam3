@@ -96,6 +96,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);*/
 
     Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
+    std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
 
     sendmsg.header.stamp = this->get_clock()->now();
     sendmsg.header.frame_id = "map";
@@ -108,6 +109,9 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     sendmsg.pose.orientation.y = -SE3.params()(2);
     sendmsg.pose.orientation.z = SE3.params()(1);
     sendmsg.pose.orientation.w = SE3.params()(3);
+
+    
+    RCLCPP_INFO(this->get_logger(), "x: %s", points[0]->GetWorldPos()(0));
 
     publisher->publish(sendmsg);
    
