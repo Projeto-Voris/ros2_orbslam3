@@ -20,27 +20,27 @@ File.version: "1.0"
 Camera.type: "PinHole"
 
 # Camera calibration and distortion parameters (OpenCV) 
-Camera1.fx: 1.3552e+03
-Camera1.fy: 1.3546e+03
-Camera1.cx: 773.2708
-Camera1.cy: 600.2590
+Camera1.fx: 809.0540
+Camera1.fy: 808.9344
+Camera1.cx: 775.6627
+Camera1.cy: 595.0128
 
-Camera1.k1: -0.1229
-Camera1.k2: 0.2096
-Camera1.k3: 0.0150
-Camera1.p1: 0.0011
-Camera1.p2: -7.8117e-05
+Camera1.k1: -0.0575
+Camera1.k2: 0.1311
+Camera1.k3: -0.0705
+Camera1.p1: -0.0015
+Camera1.p2: 0.0010
 
-Camera2.fx: 1.3544e+03
-Camera2.fy: 1.3535e+03
-Camera2.cx: 768.5709
-Camera2.cy: 604.9496
+Camera2.fx: 805.2300
+Camera2.fy: 804.9663
+Camera2.cx: 781.3354
+Camera2.cy: 596.5872
 
-Camera2.k1: -0.1211
-Camera2.k2: 0.1783
-Camera2.k3: 0.0914
-Camera2.p1: 7.3428e-04
-Camera2.p2: -7.8944e-05
+Camera2.k1: -0.0578 
+Camera2.k2: 0.1313 
+Camera2.k3: -0.0693
+Camera2.p1: -0.0015 
+Camera2.p2: 6.5700e-04
 
 Camera.width: 1600
 Camera.height: 1200
@@ -58,9 +58,9 @@ Stereo.T_c1_c2: !!opencv-matrix
   rows: 4
   cols: 4
   dt: f
-  data: [0.9891, 0.0011, -0.1471,-242.5552e-3,
-         -0.0014,1.0000,-0.0017, 0.4627e-3,
-         0.1471,0.0019, 0.9891, 17.3843e-3,
+  data: [1.0000, -0.0002, 0.0083,-247.6394e-3,
+         0.0002,1.0000,0.0019, 0.2959e-3,
+         -0.0083,-0.0019, 1.0000, 3.0479e-3,
          0,0,0,1.000000000000000]
 
 #--------------------------------------------------------------------------------------------
