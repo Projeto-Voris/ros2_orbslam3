@@ -16,6 +16,7 @@
 #include"Frame.h"
 #include "Map.h"
 #include "Tracking.h"
+#include "MapPoint.h"
 
 
 class StereoSlamNode : public rclcpp::Node
