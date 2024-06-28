@@ -49,7 +49,7 @@ private:
 
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pclpublisher;
-    clcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pclpublisher;
+    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr imgpublisher;
 };
 
 #endif

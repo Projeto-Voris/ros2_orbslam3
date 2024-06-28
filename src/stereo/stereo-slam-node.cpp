@@ -55,6 +55,7 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
     publisher = this->create_publisher<geometry_msgs::msg::PoseStamped>("orbslam/pose", 10);
     pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("orbslam/pointcloud", 10);
+    imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("orbslam/img_keypoints", 10);
 }
 
 StereoSlamNode::~StereoSlamNode()
@@ -95,7 +96,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
     auto sendmsg = geometry_msgs::msg::PoseStamped();
     auto pointcloudmsg = sensor_msgs::msg::PointCloud2();
-    
+    sensor_msgs::msg::Image imgmsg;
     /*cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
     cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);*/
 
@@ -104,6 +105,8 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
 
     std::vector<int> indexes;
+    cv_bridge::CvImage img_bridge;
+    sensor_msgs::msg::Image img_msg;
 
     sendmsg.header.stamp = this->get_clock()->now();
     sendmsg.header.frame_id = "map";
@@ -169,7 +172,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     }
     
     cv::drawKeypoints(cv_ptrLeft->image, keypoints, imKey,cv::Scalar(0,255,0), cv::DrawMatchesFlags::DEFAULT);
-    sensor_msgs::ImagePtr imgmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", imKey).toImageMsg();
+    cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", imKey).toImageMsg(imgmsg);
 
     imgpublisher->publish(imgmsg);
     pclpublisher->publish(pointcloudmsg);
