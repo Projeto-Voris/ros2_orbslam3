@@ -53,9 +53,13 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
 
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
+
     publisher = this->create_publisher<geometry_msgs::msg::PoseStamped>("orbslam/pose", 10);
     pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("orbslam/pointcloud", 10);
     imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("orbslam/img_keypoints", 10);
+
+    save_pcl_srv = this->create_service<std_srvs::srv::Trigger>("orbslam/save_pcl",std::bind(&StereoSlamNode::SavePointCloudSRV, this, std::placeholders::_1, std::placeholders::_2));
+
 }
 
 StereoSlamNode::~StereoSlamNode()
@@ -178,4 +182,26 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     pclpublisher->publish(pointcloudmsg);
     publisher->publish(sendmsg);
    
+}
+void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res){
+    std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
+    ofstream MyFile("/ws/pcl_file.csv");
+    std::cout << "Service called" << std::endl;
+
+    MyFile << 'x,y,z' << endl;
+
+    for (size_t i = 0; i < points.size(); i++)
+    {
+        if(points[i] != 0){
+            float x = points[i]->GetWorldPos()(0);
+            float y = points[i]->GetWorldPos()(2);
+            float z = -points[i]->GetWorldPos()(1);
+
+            // Write to the file
+            MyFile << x << ',' << y << ',' << z << endl;
+
+        }
+    }
+    // Close the file
+    MyFile.close();
 }
