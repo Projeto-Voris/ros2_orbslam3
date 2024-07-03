@@ -47,18 +47,24 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
         cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,M1l,M2l);
         cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
     }*/
+//    std::string left_topic = this->get_parameter("/stereo/left_cam").as_string();
+//    std::string right_topic = this->get_parameter("/stereo/right_cam").as_string();
+//    std::string namespace_node = this->get_parameter("/stereo/namespace").as_string();
+    std::string left_topic = "/left/image_raw";
+    std::string right_topic = "/right/image_raw";
 
-    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), "left_camera/image_raw");
-    right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), "right_camera/image_raw");
+//    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), namespace_node+"/"+left_topic);
+left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_topic);
+    right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), right_topic);
 
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
 
-    publisher = this->create_publisher<geometry_msgs::msg::PoseStamped>("orbslam/pose", 10);
-    pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("orbslam/pointcloud", 10);
-    imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("orbslam/img_keypoints", 10);
+    publisher = this->create_publisher<geometry_msgs::msg::PoseStamped>("pose", 10);
+    pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud", 10);
+    imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("img_keypoints", 10);
 
-    save_pcl_srv = this->create_service<std_srvs::srv::Trigger>("orbslam/save_pcl",std::bind(&StereoSlamNode::SavePointCloudSRV, this, std::placeholders::_1, std::placeholders::_2));
+    save_pcl_srv = this->create_service<std_srvs::srv::Trigger>("save_pcl",std::bind(&StereoSlamNode::SavePointCloudSRV, this, std::placeholders::_1, std::placeholders::_2));
 
 }
 
@@ -94,7 +100,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
     cv::Mat Tcw;
     cv::Mat imKey;
-    bool debub = true;
+    bool debug = true;
   
 
 
