@@ -47,14 +47,14 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
         cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,M1l,M2l);
         cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
     }*/
-//    std::string left_topic = this->get_parameter("/stereo/left_cam").as_string();
-//    std::string right_topic = this->get_parameter("/stereo/right_cam").as_string();
-//    std::string namespace_node = this->get_parameter("/stereo/namespace").as_string();
+//  std::string left_topic = this->get_parameter("/stereo/left_cam").as_string();
+//  std::string right_topic = this->get_parameter("/stereo/right_cam").as_string();
+//  std::string namespace_node = this->get_parameter("/stereo/namespace").as_string();
     std::string left_topic = "/left/image_raw";
     std::string right_topic = "/right/image_raw";
 
-//    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), namespace_node+"/"+left_topic);
-left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_topic);
+//  left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), namespace_node+"/"+left_topic);
+    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_topic);
     right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), right_topic);
 
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
