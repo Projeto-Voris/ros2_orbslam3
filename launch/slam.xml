@@ -5,7 +5,7 @@
 
     <node pkg="ros2_orbslam3" exec="stereo" name="stereo" namespace="/sm2/debug"
           args="/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt
-          /ws/src/ros2_orbslam3/config/stereo/CALIBDEFINITIVO.yaml
+          /ws/src/ros2_orbslam3/config/stereo/simu_test.yaml
           True" >
         <remap from="/left/image_raw" to="$(var left_image)"/>
         <remap from="/right/image_raw" to="$(var right_image)"/>

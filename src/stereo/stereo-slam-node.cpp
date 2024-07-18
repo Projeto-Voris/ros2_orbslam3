@@ -187,8 +187,8 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
         imgpublisher->publish(imgmsg);
         pclpublisher->publish(pointcloudmsg);
-        publisher->publish(sendmsg);
     }
+        publisher->publish(sendmsg);
    
 }
 void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res){
