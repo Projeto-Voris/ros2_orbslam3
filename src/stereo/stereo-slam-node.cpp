@@ -194,7 +194,6 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res){
     std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
     ofstream MyFile("/ws/pcl_file.csv");
-    std::cout << "Service called" << std::endl;
 
     MyFile << 'x,y,z' << endl;
 
@@ -212,4 +211,36 @@ void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPt
     }
     // Close the file
     MyFile.close();
+}
+
+void StereoSlamNode::LoadCameraParameters(sensor_msgs::msgs::CameraInfo cam_info){
+    ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
+
+    MyFile << '%YAML:1.0' << endl;
+    MyFile << 'File.version: "1.0"' << endl;
+
+    MyFile << 'Camera.type: "'<< cam_info.distortion_model <<'"'<< endl;
+
+    MyFile << 'Camera1.fx: "'<< cam_info.distortion_model <<'"'<< endl;
+    MyFile << 'Camera1.fy: "'<< cam_info.distortion_model <<'"'<< endl;
+
+    MyFile << 'Camera1.cx: "'<< cam_info.distortion_model <<'"'<< endl;
+    MyFile << 'Camera1.cy:"'<< cam_info.distortion_model <<'"'<< endl;
+
+    MyFile << 'Camera1.k1: "'<< cam_info.distortion_model <<'"'<< endl;
+    MyFile << 'Camera1.k2: "'<< cam_info.distortion_model <<'"'<< endl;
+    MyFile << 'Camera1.k3: "'<< cam_info.distortion_model <<'"'<< endl;
+
+    MyFile << 'Camera2.p1: "'<< cam_info.distortion_model <<'"'<< endl;
+    MyFile << 'Camera2.p2: "'<< cam_info.distortion_model <<'"'<< endl;
+
+    MyFile << 'Camera2.p1: "'<< cam_info.distortion_model <<'"'<< endl;
+    MyFile << 'Camera2.p2: "'<< cam_info.distortion_model <<'"'<< endl;
+
+
+
+
+    MyFile.close();
+
+
 }
