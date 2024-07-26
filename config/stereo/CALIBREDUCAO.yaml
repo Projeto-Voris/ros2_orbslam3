@@ -1,0 +1,180 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# System config
+#--------------------------------------------------------------------------------------------
+
+# When the variables are commented, the system doesn't load a previous session or not store the current one
+
+# If the LoadFile doesn't exist, the system give a message and create a new Atlas from scratch
+#System.LoadAtlasFromFile: "Session_MH01_MH02_MH03_Stereo60_Pseudo"
+
+# The store file is created from the current session, if a file with the same name exists it is deleted
+#System.SaveAtlasToFile: "Session_MH01_MH02_MH03_Stereo60_Pseudo"
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+
+File.version: "1.0"
+#obrigatorio especifica que é o novo formato de calibração usados
+
+Camera.type: "PinHole"
+#ESPECIFICA O TIPO DE CAMERA USADO podendo receber AS  TRES SEGUINTES ENTRADAS:
+#
+#"PinHole" = cameras pinhole
+#
+#"KannalaBrandt8" = Utilizar quando usar a olho de peixe utilizando calibração Kannala-Brandt como modelo de de calobração
+#
+#"Rectified" = pinhole retificada busca remover distorção de lente
+#
+
+# Camera calibration and distortion parameters (OpenCV) 
+#Camera 1 = esquerda   Camera 2 = direitra caso de uso em sistemamonocular utilizar apenas camera 1
+Camera1.fx: 405.7307
+Camera1.fy: 405.5325
+#FOCAL LEATE
+Camera1.cx: 385.6037
+Camera1.cy: 297.5442
+#Principal point
+
+Camera1.k1: -0.0513
+Camera1.k2: 0.1197
+Camera1.k3: -0.0635
+#Camera1.k4: (FLOAT)
+#Distorção radial sendo K3 opicional e k4 aapenas em Kannala-brandt (olho de peixe)
+Camera1.p1: -0.0018
+Camera1.p2: -3.8188e-04
+#distorção tangencial
+
+Camera2.fx: 403.4488
+Camera2.fy: 403.2868
+#FOCAL LENGTH
+Camera2.cx: 388.3216
+Camera2.cy: 298.4181
+#principal Poijnt
+
+Camera2.k1: -0.0456 
+Camera2.k2: 0.1054 
+Camera2.k3: -0.0523
+#Camera1.k4: (FLOAT)
+#Distorção radial sendo K3 opicional e k4 aapenas em Kannala-brandt (olho de peixe)
+Camera2.p1: -0.0016
+Camera2.p2: -8.7169e-04
+#distorção rangencial
+
+Camera.width: 1600
+Camera.height: 1200
+#Camera.width e Camera.height tamanho da imagem que será recebida
+
+Camera.newWidth: 800
+Camera.newHeight: 600
+#opcional rescala a imagem e segundo ele recomputa os parametros de calibração.
+
+# Camera frames per second 
+Camera.fps: 30
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+System.thFarPoints: 30.0
+#Valor opcional colocar valor em metros da um valor maximo de profundidade permitido aos pontos.
+
+Stereo.ThDepth: 12.0
+#quantas vezes a  baseline da camera que usamos deve ser usada pra distancia no caso seria distancia que queremos *baseline
+
+#em caso de uso de um sistema retificado usar:
+#Stereo.b: (FLOAT)que é a baselione em metros
+#Distamcia  entra duas cameras = baseline
+
+#em caso de  usar um sistema stereo não retificado:
+Stereo.T_c1_c2: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: f
+  data: [1.0000, -0.0002, 0.0088,-247.8563e-3,
+         0.0002,1.0000,0.0017, 0.1715e-3,
+         -0.0088,-0.0017  , 1.0000, 3.9650e-3,
+         0,0,0,1.000000000000000]
+
+#primeiros valores são d ametriz e a ultima coluna translação da camera
+
+#Em caso de uso de um sistema de olho de peixe usar as seguintes variaveis
+#Camera1.overlappingBegin:(int) 
+#Camera2.overlappingBegin:(int)
+#Coluna inicial do overlap
+#Camera1.overlappingEnd:(int)
+#Camera2.overlappingEnd:(int)
+#coluna final do oberlap
+
+#em caso de cameras que possuam IMU usar:
+
+#IMU.NoiseGyro:  (FLOAT)
+#densidade de ruido do giroscopio
+
+#IMU.NoiseAcc:  (FLOAT)
+#Densidade de ruido do acelerrometro
+
+#IMU.GyroWalk:  (FLOAT)
+#Variação de passo aleatorio do giroscopio
+
+#IMU.AccWalk:  (FLOAT)
+#Variação de passo aleatorio do acelerometro
+
+#IMU.Frequency:  (FLOAT)
+#frequencia do IMU
+
+#IMU.T_b_c1:  (cv::Mat)
+#Posição relativa entre IMU e camera 1
+
+#IMU.InsertKFsWhenLost:  (int)(opcional)
+#especifica se o sistema quando o sistema se  perde e o sistema inercial não
+
+#em casos de cameras coloridas:
+#RGBD.DepthMapFactor: (float) 
+#fator de transformação domapade profundidade
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 1500
+#numero de caracteristicas a serem estradidas
+
+# ORB Extractor: Scale factor between levels in the scale pyramid 	
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid	
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast			
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 6
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+#tamanho do keyframe no mapa do visualisador
+Viewer.KeyFrameLineWidth: 1.0
+#Espeçura da linha do keyframe
+Viewer.GraphLineWidth: 0.9
+
+Viewer.PointSize: 2.0
+#tamanho no ponto do mapa
+Viewer.CameraSize: 0.08
+#tamanho da camera no mapa
+Viewer.CameraLineWidth: 3.0
+#largutra do desenho d acamera
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
+#ponto inicial do mapa
+Viewer.imageViewScale: 1.0
+#rescala no visualizaor do mapa (não interfere no SLAM)
+

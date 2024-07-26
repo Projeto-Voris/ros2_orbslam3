@@ -46,11 +46,11 @@ Camera.width: 1600
 Camera.height: 1200
 
 # Camera frames per second 
-Camera.fps: 30  
+Camera.fps: 30 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
 
-Stereo.ThDepth: 40.0
+Stereo.ThDepth: 12.0
 Stereo.T_c1_c2: !!opencv-matrix
   rows: 4
   cols: 4

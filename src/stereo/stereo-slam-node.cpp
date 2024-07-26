@@ -94,8 +94,9 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
     cv::Mat Tcw;
     cv::Mat imKey;
-    bool debub = true;
+    bool debug = true;
   
+
 
 
     auto sendmsg = geometry_msgs::msg::PoseStamped();
@@ -104,7 +105,13 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     /*cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
     cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);*/
 
-    Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
+    cv::Mat resized_left;
+    cv::Mat resized_right;
+    cv::resize(cv_ptrLeft->image, resized_left, cv::Size(800,600));
+    cv::resize(cv_ptrRight->image, resized_right, cv::Size(800,600));
+
+    //Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
+    Sophus::SE3f SE3 = m_SLAM->TrackStereo(resized_left, resized_right, msgLeft->header.stamp.sec);
     std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
     std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
 
@@ -162,7 +169,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
         pointcloudmsg.point_step = 12; // Size of a single point in bytes (3 floats * 4 bytes/float)
         pointcloudmsg.row_step = pointcloudmsg.point_step * pointcloudmsg.width;
-        pointcloudmsg.is_bigendian = false;
+        pointcloudmsg.is_bigendian = true;
         pointcloudmsg.data.resize(pointcloudmsg.point_step*count);
 
         for (size_t i = 0; i < count; i++)
