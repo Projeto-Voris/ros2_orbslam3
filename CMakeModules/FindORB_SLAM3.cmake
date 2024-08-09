@@ -7,7 +7,7 @@
 #  e.g. `set( ORB_SLAM3_ROOT_DIR=~/ORB_SLAM3) `
 #  below is mine
 
-set(ORB_SLAM3_ROOT_DIR "/Dev/ORB_SLAM3/")
+set(ORB_SLAM3_ROOT_DIR "/home/gustavo/Documents/ORB_SLAM3/")
 
 # message(${ORB_SLAM3_ROOT_DIR})
 # message(${ORB_SLAM3_ROOT_DIR}/include)
