@@ -56,7 +56,7 @@ ament_target_dependencies(stereo rclcpp sensor_msgs geometry_msgs cv_bridge mess
 
 target_link_libraries(stereo ${OpenCV_LIBS})
 
-install(TARGETS mono DESTINATION lib/${PROJECT_NAME})
+install(TARGETS mono stereo DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 ament_package()

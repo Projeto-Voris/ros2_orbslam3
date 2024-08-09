@@ -10,7 +10,7 @@ MonocularSlamNode::MonocularSlamNode(ORB_SLAM3::System* pSLAM)
     m_SLAM = pSLAM;
     // std::cout << "slam changed" << std::endl;
     m_image_subscriber = this->create_subscription<ImageMsg>(
-        "sync_camera/image",
+        "stereo_left",
         10,
         std::bind(&MonocularSlamNode::GrabImage, this, std::placeholders::_1));
     publisher = this->create_publisher<geometry_msgs::msg::PoseStamped>("orbslam/pose", 10);
