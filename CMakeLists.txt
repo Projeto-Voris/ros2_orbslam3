@@ -28,7 +28,7 @@ find_package(message_filters REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
 find_package(std_srvs REQUIRED)
-
+find_package(OpenCV 4.5.4 REQUIRED)
 
 add_executable(mono
         src/monocular/mono.cpp
@@ -37,13 +37,13 @@ add_executable(mono
 ament_target_dependencies(mono rclcpp sensor_msgs geometry_msgs cv_bridge ORB_SLAM3 std_srvs
         Pangolin)
 
-add_executable(rgbd
+#[[add_executable(rgbd
         src/rgbd/rgbd.cpp
         src/rgbd/rgbd-slam-node.cpp
 )
 ament_target_dependencies(rgbd rclcpp sensor_msgs geometry_msgs cv_bridge message_filters std_srvs
         ORB_SLAM3
-        Pangolin)
+        Pangolin)]]
 
 add_executable(stereo
         src/stereo/stereo.cpp
@@ -54,8 +54,9 @@ ament_target_dependencies(stereo rclcpp sensor_msgs geometry_msgs cv_bridge mess
         ORB_SLAM3
         Pangolin)
 
+target_link_libraries(stereo ${OpenCV_LIBS})
 
-install(TARGETS mono rgbd stereo DESTINATION lib/${PROJECT_NAME})
+install(TARGETS mono DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 ament_package()
