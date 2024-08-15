@@ -8,6 +8,8 @@
 
 #include"System.h"
 
+void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info);
+
 int main(int argc, char **argv)
 {
     if(argc < 4)
