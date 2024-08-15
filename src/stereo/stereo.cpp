@@ -43,6 +43,8 @@ int main(int argc, char **argv)
 
     if(left_camera_info_received && right_camera_info_received)
         write_config_file(left_camera_info, right_camera_info);
+    else
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No camera info provided");
 
     const string path_to_vocabulary = "/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt";
     const string path_to_settings = "/ws/src/ros2_orbslam3/config/stereo/config.yaml";
