@@ -24,11 +24,8 @@ int main(int argc, char **argv)
     // Create SLAM system. It initializes all system threads and gets ready to process frames
     const bool visualization = true;
 
-    std::string left_image_topic = "/left/image_raw";
-    std::string right_image_topic = "/right/image_raw";
-
-    std::string left_info_topic = "/left/image_raw";
-    std::string right_info_topic = "/right/image_raw";
+    std::string left_info_topic = "/left/camera_info";
+    std::string right_info_topic = "/right/camera_info";
 
     auto right_camera_info = sensor_msgs::msg::CameraInfo();
     auto left_camera_info = sensor_msgs::msg::CameraInfo();
