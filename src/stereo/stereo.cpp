@@ -19,12 +19,9 @@ int main(int argc, char **argv)
     rclcpp::init(argc, argv);
 
     // malloc error using new.. try shared ptr
-    // Create SLAM system. It initializes all system threads and gets ready to process frames.
+    // Create SLAM system. It initializes all system threads and gets ready to process frames
 
-    bool visualization = true;
-    ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, visualization);
-
-    auto node = std::make_shared<StereoSlamNode>(&SLAM, argv[2], argv[3]);
+    auto node = std::make_shared<StereoSlamNode>(argv[2]);
 
     rclcpp::spin(node);
 

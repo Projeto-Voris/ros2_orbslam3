@@ -5,66 +5,39 @@
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify)
-:   Node("orbslam"),
-    m_SLAM(pSLAM)
+StereoSlamNode::StereoSlamNode(const string &strSettingsFile)
+:   Node("orbslam")
 {
-    /*stringstream ss(strDoRectify);
-    ss >> boolalpha >> doRectify;
+    std::string left_image_topic = "/left/image_raw";
+    std::string right_image_topic = "/right/image_raw";
 
-    if (true){
+    std::string left_info_topic = "/left/image_raw";
+    std::string right_info_topic = "/right/image_raw";
 
-        cv::FileStorage fsSettings(strSettingsFile, cv::FileStorage::READ);
-        if(!fsSettings.isOpened()){
-            cerr << "ERROR: Wrong path to settings" << endl;
-            assert(0);
-        }
 
-        cv::Mat K_l, K_r, P_l, P_r, R_l, R_r, D_l, D_r;
-        fsSettings["LEFT.K"] >> K_l;
-        fsSettings["RIGHT.K"] >> K_r;
-
-        fsSettings["LEFT.P"] >> P_l;
-        fsSettings["RIGHT.P"] >> P_r;
-
-        fsSettings["LEFT.R"] >> R_l;
-        fsSettings["RIGHT.R"] >> R_r;
-
-        fsSettings["LEFT.D"] >> D_l;
-        fsSettings["RIGHT.D"] >> D_r;
-
-        int rows_l = fsSettings["LEFT.height"];
-        int cols_l = fsSettings["LEFT.width"];
-        int rows_r = fsSettings["RIGHT.height"];
-        int cols_r = fsSettings["RIGHT.width"];
-        cout << "Trueeeeeeeee" << endl;
-        if(K_l.empty() || K_r.empty() || P_l.empty() || P_r.empty() || R_l.empty() || R_r.empty() || D_l.empty() || D_r.empty() ||
-                rows_l==0 || rows_r==0 || cols_l==0 || cols_r==0){
-            cerr << "ERROR: Calibration parameters to rectify stereo are missing!" << endl;
-            assert(0);
-        }
-
-        cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,M1l,M2l);
-        cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
-    }*/
-//  std::string left_topic = this->get_parameter("/stereo/left_cam").as_string();
-//  std::string right_topic = this->get_parameter("/stereo/right_cam").as_string();
-//  std::string namespace_node = this->get_parameter("/stereo/namespace").as_string();
-    std::string left_topic = "/left/image_raw";
-    std::string right_topic = "/right/image_raw";
-
-//  left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), namespace_node+"/"+left_topic);
-    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_topic);
-    right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), right_topic);
+    
 
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
+
+
 
     publisher = this->create_publisher<geometry_msgs::msg::TransformStamped>("transform", 10);
     pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud", 10);
     imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("img_keypoints", 10);
 
     save_pcl_srv = this->create_service<std_srvs::srv::Trigger>("save_pcl",std::bind(&StereoSlamNode::SavePointCloudSRV, this, std::placeholders::_1, std::placeholders::_2));
+
+    bool visualization = true;
+
+    sensor_msgs::msg::CameraInfo::ConstPtr right_camera_info;
+    sensor_msgs::msg::CameraInfo::ConstPtr left_camera_info;
+
+    bool message_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(left_camera_info, left_info_topic, std::chrono::seconds(1));
+    message_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(right_camera_info, right_info_topic, std::chrono::seconds(1));
+
+    ORB_SLAM3::System SLAM  = SLAM(strSettingsFile, "/ws/src/ros2_orbslam3/config/stereo/config.yaml", ORB_SLAM3::System::STEREO, visualization);
+    m_SLAM = &SLAM;
 
 }
 
@@ -76,10 +49,11 @@ StereoSlamNode::~StereoSlamNode()
 
 void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMsg::SharedPtr msgRight)
 {
+
     // Copy the ros rgb image message to cv::Mat.
     try
     {
-         cv_ptrLeft = cv_bridge::toCvShare(msgLeft);
+         cv_ptrLeft = cv_bridge::toCvShare(msgLeft); 
     }
     catch (cv_bridge::Exception& e)
     {
@@ -105,11 +79,11 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     auto sendmsg = geometry_msgs::msg::TransformStamped();
     
     sensor_msgs::msg::Image imgmsg;
-    /*cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
-    cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);*/
+    
 
     cv::Mat resized_left;
     cv::Mat resized_right;
+
     cv::resize(cv_ptrLeft->image, resized_left, cv::Size(800,600));
     cv::resize(cv_ptrRight->image, resized_right, cv::Size(800,600));
 
@@ -227,7 +201,7 @@ void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPt
     MyFile.close();
 }
 
-void StereoSlamNode::LoadCameraParameters(sensor_msgs::msgs::CameraInfo cam_info){
+/*void StereoSlamNode::LoadCameraParameters(sensor_msgs::msg::CameraInfo cam_info){
     ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
 
     MyFile << '%YAML:1.0' << endl;
@@ -257,4 +231,4 @@ void StereoSlamNode::LoadCameraParameters(sensor_msgs::msgs::CameraInfo cam_info
     MyFile.close();
 
 
-}
+}*/

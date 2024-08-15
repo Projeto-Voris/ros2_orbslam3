@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/wait_for_message.hpp"
 
 #include "std_srvs/srv/trigger.hpp"
 
@@ -35,7 +36,7 @@
 class StereoSlamNode : public rclcpp::Node
 {
 public:
-    StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify);
+    StereoSlamNode(const string &strSettingsFile);
 
     ~StereoSlamNode();
 
