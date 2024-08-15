@@ -60,7 +60,7 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
 
-    publisher = this->create_publisher<geometry_msgs::msg::PoseStamped>("pose", 10);
+    publisher = this->create_publisher<geometry_msgs::msg::TransformStamped>("transform", 10);
     pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud", 10);
     imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("img_keypoints", 10);
 
@@ -100,13 +100,10 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
     cv::Mat Tcw;
     cv::Mat imKey;
-    bool debug = true;
-  
+    bool debug = false;
 
-
-
-    auto sendmsg = geometry_msgs::msg::PoseStamped();
-    auto pointcloudmsg = sensor_msgs::msg::PointCloud2();
+    auto sendmsg = geometry_msgs::msg::TransformStamped();
+    
     sensor_msgs::msg::Image imgmsg;
     /*cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
     cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);*/
@@ -116,88 +113,98 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     cv::resize(cv_ptrLeft->image, resized_left, cv::Size(800,600));
     cv::resize(cv_ptrRight->image, resized_right, cv::Size(800,600));
 
-    //Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
     Sophus::SE3f SE3 = m_SLAM->TrackStereo(resized_left, resized_right, msgLeft->header.stamp.sec);
-    std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
+    
     std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
 
-    std::vector<int> indexes;
+    
     cv_bridge::CvImage img_bridge;
     sensor_msgs::msg::Image img_msg;
 
-    sendmsg.header.stamp = this->get_clock()->now();
-    sendmsg.header.frame_id = "map";
+    sendmsg.header.stamp = msgLeft->header.stamp;
+    sendmsg.header.frame_id = "base_link";
+    sendmsg.child_frame_id = "sm2_left_cam_link";
 
-    sendmsg.pose.position.x = SE3.params()(4);
-    sendmsg.pose.position.y = SE3.params()(5);
-    sendmsg.pose.position.z = SE3.params()(6);
+    sendmsg.transform.translation.x = SE3.params()(4);
+    sendmsg.transform.translation.y = SE3.params()(5);
+    sendmsg.transform.translation.z = SE3.params()(6);
 
-    sendmsg.pose.orientation.x = SE3.params()(0);
-    sendmsg.pose.orientation.y = SE3.params()(1);
-    sendmsg.pose.orientation.z = SE3.params()(2);
-    sendmsg.pose.orientation.w = SE3.params()(3);
+    sendmsg.transform.rotation.x = SE3.params()(0);
+    sendmsg.transform.rotation.y = SE3.params()(1);
+    sendmsg.transform.rotation.z = SE3.params()(2);
+    sendmsg.transform.rotation.w = SE3.params()(3);
 
     
     if(debug){
 
-        int count =0;
-        for (size_t i = 0; i < points.size(); i++)
-        {
-            if(points[i] != 0){
-                count++;
-                indexes.push_back(i);
-
-            }
-        }
-        
-        pointcloudmsg.header.stamp = this->get_clock()->now();
-        pointcloudmsg.header.frame_id = "map";
-        pointcloudmsg.height = 1;
-        pointcloudmsg.width = count;
-        pointcloudmsg.is_dense = true;
-        pointcloudmsg.fields.resize(3);
-
-        // Populate the fields
-        pointcloudmsg.fields[0].name = "x";
-        pointcloudmsg.fields[0].offset = 0;
-        pointcloudmsg.fields[0].datatype = sensor_msgs::msg::PointField::FLOAT32;
-        pointcloudmsg.fields[0].count = 1;
-
-        pointcloudmsg.fields[1].name = "y";
-        pointcloudmsg.fields[1].offset = 4;
-        pointcloudmsg.fields[1].datatype = sensor_msgs::msg::PointField::FLOAT32;
-        pointcloudmsg.fields[1].count = 1;
-
-        pointcloudmsg.fields[2].name = "z";
-        pointcloudmsg.fields[2].offset = 8;
-        pointcloudmsg.fields[2].datatype = sensor_msgs::msg::PointField::FLOAT32;
-        pointcloudmsg.fields[2].count = 1;
-
-        pointcloudmsg.point_step = 12; // Size of a single point in bytes (3 floats * 4 bytes/float)
-        pointcloudmsg.row_step = pointcloudmsg.point_step * pointcloudmsg.width;
-        pointcloudmsg.is_bigendian = true;
-        pointcloudmsg.data.resize(pointcloudmsg.point_step*count);
-
-        for (size_t i = 0; i < count; i++)
-        {
-            float x = points[indexes[i]]->GetWorldPos()(0);
-            float y = points[indexes[i]]->GetWorldPos()(2);
-            float z = -points[indexes[i]]->GetWorldPos()(1);
-
-            memcpy(&pointcloudmsg.data[i*12], &x, 4);
-            memcpy(&pointcloudmsg.data[i*12 + 4], &y, 4);
-            memcpy(&pointcloudmsg.data[i*12 + 8], &z, 4);
-        }
+        PublishPointCloud();
         
         cv::drawKeypoints(cv_ptrLeft->image, keypoints, imKey,cv::Scalar(0,255,0), cv::DrawMatchesFlags::DEFAULT);
         cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", imKey).toImageMsg(imgmsg);
 
         imgpublisher->publish(imgmsg);
-        pclpublisher->publish(pointcloudmsg);
     }
         publisher->publish(sendmsg);
    
 }
+
+void StereoSlamNode::PublishPointCloud(){
+    std::vector<int> indexes;
+    std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
+    auto pointcloudmsg = sensor_msgs::msg::PointCloud2();
+
+    int count = 0;
+    
+    for (size_t i = 0; i < points.size(); i++)
+    {
+        if(points[i] != 0){
+            count++;
+            indexes.push_back(i);
+
+        }
+    }
+    
+    pointcloudmsg.header.stamp = this->get_clock()->now();
+    pointcloudmsg.header.frame_id = "map";
+    pointcloudmsg.height = 1;
+    pointcloudmsg.width = count;
+    pointcloudmsg.is_dense = true;
+    pointcloudmsg.fields.resize(3);
+
+    // Populate the fields
+    pointcloudmsg.fields[0].name = "x";
+    pointcloudmsg.fields[0].offset = 0;
+    pointcloudmsg.fields[0].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    pointcloudmsg.fields[0].count = 1;
+
+    pointcloudmsg.fields[1].name = "y";
+    pointcloudmsg.fields[1].offset = 4;
+    pointcloudmsg.fields[1].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    pointcloudmsg.fields[1].count = 1;
+
+    pointcloudmsg.fields[2].name = "z";
+    pointcloudmsg.fields[2].offset = 8;
+    pointcloudmsg.fields[2].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    pointcloudmsg.fields[2].count = 1;
+
+    pointcloudmsg.point_step = 12; // Size of a single point in bytes (3 floats * 4 bytes/float)
+    pointcloudmsg.row_step = pointcloudmsg.point_step * pointcloudmsg.width;
+    pointcloudmsg.is_bigendian = true;
+    pointcloudmsg.data.resize(pointcloudmsg.point_step*count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        float x = points[indexes[i]]->GetWorldPos()(0);
+        float y = points[indexes[i]]->GetWorldPos()(1);
+        float z = -points[indexes[i]]->GetWorldPos()(2);
+
+        memcpy(&pointcloudmsg.data[i*12], &x, 4);
+        memcpy(&pointcloudmsg.data[i*12 + 4], &y, 4);
+        memcpy(&pointcloudmsg.data[i*12 + 8], &z, 4);
+    }
+    pclpublisher->publish(pointcloudmsg);
+}
+
 void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res){
     std::vector<ORB_SLAM3::MapPoint*> points = m_SLAM->GetTrackedMapPoints();
     ofstream MyFile("/ws/pcl_file.csv");
