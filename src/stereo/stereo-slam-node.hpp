@@ -5,15 +5,18 @@
 #include <fstream>
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_srvs/srv/trigger.hpp"
-#include "sensor_msgs/msg/image.hpp"
-#include "sensor_msgs/msg/camera_info.hpp"
 
+#include "std_srvs/srv/trigger.hpp"
+
+#include "sensor_msgs/msg/image.hpp"
+
+#include "sensor_msgs/msg/camera_info.hpp"
 
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "sensor_msgs/msg/point_field.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/pose.hpp"
+
+#include "geometry_msgs/msg/transform_stamped.hpp"
+#include "geometry_msgs/msg/transform.hpp"
 
 #include "message_filters/subscriber.h"
 #include "message_filters/synchronizer.h"
@@ -37,6 +40,7 @@ public:
     ~StereoSlamNode();
 
     void SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res);
+    void PublishPointCloud();
 
 private: 
     using ImageMsg = sensor_msgs::msg::Image;
@@ -57,7 +61,7 @@ private:
 
     std::shared_ptr<message_filters::Synchronizer<approximate_sync_policy> > syncApproximate;
 
-    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr publisher;
+    rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr publisher;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pclpublisher;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr imgpublisher;
 
