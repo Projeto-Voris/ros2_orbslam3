@@ -35,11 +35,14 @@ int main(int argc, char **argv)
 
     auto info_node = std::make_shared<rclcpp::Node>("camera_info_subscriber");
 
-    left_camera_info_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(left_camera_info, info_node,left_info_topic, std::chrono::seconds(1));
-    right_camera_info_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(right_camera_info, info_node,right_info_topic, std::chrono::seconds(1));
+    left_camera_info_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(left_camera_info, info_node,left_info_topic, std::chrono::seconds(5));
+    right_camera_info_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(right_camera_info, info_node,right_info_topic, std::chrono::seconds(5));
 
-    if(left_camera_info_received && right_camera_info_received)
+    if(left_camera_info_received && right_camera_info_received){
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Camera info received");
         write_config_file(left_camera_info, right_camera_info);
+    }
+
     else
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No camera info provided");
 
