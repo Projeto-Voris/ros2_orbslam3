@@ -227,7 +227,7 @@ void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPt
     MyFile.close();
 }
 
-void StereoSlamNode::LoadCameraParameters(sensor_msgs::msgs::CameraInfo cam_info){
+/*void StereoSlamNode::LoadCameraParameters(sensor_msgs::msgs::CameraInfo cam_info){
     ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
 
     MyFile << '%YAML:1.0' << endl;
@@ -257,4 +257,4 @@ void StereoSlamNode::LoadCameraParameters(sensor_msgs::msgs::CameraInfo cam_info
     MyFile.close();
 
 
-}
+}*/
