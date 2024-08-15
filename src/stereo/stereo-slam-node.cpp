@@ -1,12 +1,15 @@
 #include "stereo-slam-node.hpp"
 
 #include<opencv2/core/core.hpp>
+#include<string>
+#include "System.h"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-StereoSlamNode::StereoSlamNode(const string &strSettingsFile)
-:   Node("orbslam")
+StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify)
+:   Node("orbslam"),
+    m_SLAM(pSLAM)
 {
     std::string left_image_topic = "/left/image_raw";
     std::string right_image_topic = "/right/image_raw";
@@ -27,17 +30,6 @@ StereoSlamNode::StereoSlamNode(const string &strSettingsFile)
     imgpublisher = this->create_publisher<sensor_msgs::msg::Image>("img_keypoints", 10);
 
     save_pcl_srv = this->create_service<std_srvs::srv::Trigger>("save_pcl",std::bind(&StereoSlamNode::SavePointCloudSRV, this, std::placeholders::_1, std::placeholders::_2));
-
-    bool visualization = true;
-
-    sensor_msgs::msg::CameraInfo::ConstPtr right_camera_info;
-    sensor_msgs::msg::CameraInfo::ConstPtr left_camera_info;
-
-    bool message_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(left_camera_info, left_info_topic, std::chrono::seconds(1));
-    message_received = rclcpp::wait_for_message<sensor_msgs::msg::CameraInfo>(right_camera_info, right_info_topic, std::chrono::seconds(1));
-
-    ORB_SLAM3::System SLAM  = SLAM(strSettingsFile, "/ws/src/ros2_orbslam3/config/stereo/config.yaml", ORB_SLAM3::System::STEREO, visualization);
-    m_SLAM = &SLAM;
 
 }
 
@@ -200,35 +192,3 @@ void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPt
     // Close the file
     MyFile.close();
 }
-
-/*void StereoSlamNode::LoadCameraParameters(sensor_msgs::msg::CameraInfo cam_info){
-    ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
-
-    MyFile << '%YAML:1.0' << endl;
-    MyFile << 'File.version: "1.0"' << endl;
-
-    MyFile << 'Camera.type: "'<< cam_info.distortion_model <<'"'<< endl;
-
-    MyFile << 'Camera1.fx: "'<< cam_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.fy: "'<< cam_info.distortion_model <<'"'<< endl;
-
-    MyFile << 'Camera1.cx: "'<< cam_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.cy:"'<< cam_info.distortion_model <<'"'<< endl;
-
-    MyFile << 'Camera1.k1: "'<< cam_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.k2: "'<< cam_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.k3: "'<< cam_info.distortion_model <<'"'<< endl;
-
-    MyFile << 'Camera2.p1: "'<< cam_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera2.p2: "'<< cam_info.distortion_model <<'"'<< endl;
-
-    MyFile << 'Camera2.p1: "'<< cam_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera2.p2: "'<< cam_info.distortion_model <<'"'<< endl;
-
-
-
-
-    MyFile.close();
-
-
-}*/

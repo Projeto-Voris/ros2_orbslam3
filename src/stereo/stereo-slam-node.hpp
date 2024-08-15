@@ -36,7 +36,7 @@
 class StereoSlamNode : public rclcpp::Node
 {
 public:
-    StereoSlamNode(const string &strSettingsFile);
+    StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify);
 
     ~StereoSlamNode();
 
