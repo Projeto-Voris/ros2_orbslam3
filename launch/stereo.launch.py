@@ -13,6 +13,14 @@ def generate_launch_description():
             'right_image',
             default_value=['/right/image_raw']
         ),
+        LaunchArg(
+            'left_info',
+            default_value=['/left/camera_info']
+        ),
+        LaunchArg(
+            'right_info',
+            default_value=['/right/camera_info']
+        ),
         Node(
             package='ros2_orbslam3',
             namespace='/sm2/debug',
@@ -21,7 +29,9 @@ def generate_launch_description():
             arguments= [["/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt"], ["/ws/src/ros2_orbslam3/config/stereo/CALIBRED22072024.yaml"],["True"]],
             remappings=[
                 ('/left/image_raw',  LaunchConfig('left_image')),
-                ('/right/image_raw', LaunchConfig('right_image'))
+                ('/right/image_raw', LaunchConfig('right_image')),
+                ('/left/camera_info', LaunchConfig('left_info')),
+                ('/right/camera_info', LaunchConfig('right_info'))
             ]
         )
 
