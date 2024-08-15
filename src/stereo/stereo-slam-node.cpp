@@ -121,7 +121,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     cv_bridge::CvImage img_bridge;
     sensor_msgs::msg::Image img_msg;
 
-    sendmsg.header.stamp = this->get_clock()->now();
+    sendmsg.header.stamp = msgLeft->header.stamp;
     sendmsg.header.frame_id = "base_link";
     sendmsg.child_frame_id = "sm2_left_cam_link";
 
