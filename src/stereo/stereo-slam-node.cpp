@@ -110,7 +110,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
 
         imgpublisher->publish(imgmsg);
     }
-        publisher->publish(sendmsg);
+    publisher->publish(sendmsg);
    
 }
 

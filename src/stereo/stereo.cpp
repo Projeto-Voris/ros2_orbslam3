@@ -40,12 +40,12 @@ int main(int argc, char **argv)
 
     if(left_camera_info_received && right_camera_info_received){
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Camera info received");
+        write_config_file(left_camera_info, right_camera_info);
     }
 
     else
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No camera info provided");
 
-    write_config_file(left_camera_info, right_camera_info);
 
     const string path_to_vocabulary = "/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt";
     const string path_to_settings = "/ws/src/ros2_orbslam3/config/stereo/config.yaml";
@@ -76,18 +76,36 @@ void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msg
     MyFile << "Camera1.cx: "<< left_camera_info.k[2] << endl;
     MyFile << "Camera1.cy: "<< left_camera_info.k[5]  << endl;
 
-    /*MyFile << 'Camera1.k1: "'<< left_camera_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.k2: "'<< left_camera_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.k3: "'<< left_camera_info.distortion_model <<'"'<< endl;
+    MyFile << "Camera1.k1: "<< left_camera_info.d[0] << endl;
+    MyFile << "Camera1.k2: "<< left_camera_info.d[1]  << endl;
+    MyFile << "Camera1.k3: "<< left_camera_info.d[2] << endl;
 
-    MyFile << 'Camera1.p1: "'<< right_camera_info.distortion_model <<'"'<< endl;
-    MyFile << 'Camera1.p2: "'<< right_camera_info.distortion_model <<'"'<< endl;*/
+    MyFile << "Camera1.p1: "<< left_camera_info.d[3] << endl;
+    MyFile << "Camera1.p2: "<< left_camera_info.d[4]  << endl;
 
-    MyFile << "Camera2.fx: " << right_camera_info.k[0] << endl;
+    MyFile << "Camera2.fx: "<< right_camera_info.k[0] << endl;
     MyFile << "Camera2.fy: "<< right_camera_info.k[4] << endl;
 
     MyFile << "Camera2.cx: "<< right_camera_info.k[2] << endl;
     MyFile << "Camera2.cy: "<< right_camera_info.k[5]  << endl;
+
+    MyFile << "Camera2.k1: "<< right_camera_info.d[0] << endl;
+    MyFile << "Camera2.k2: "<< right_camera_info.d[1]  << endl;
+    MyFile << "Camera2.k3: "<< right_camera_info.d[2] << endl;
+
+    MyFile << "Camera2.p1: "<< right_camera_info.d[3] << endl;
+    MyFile << "Camera2.p2: "<< right_camera_info.d[4]  << endl;
+
+    float baseline = right_camera_info.p[3]/(-right_camera_info.p[0]);
+
+    MyFile << "Stereo.T_c1_c2: !!opencv-matrix" << endl;
+    MyFile << " " << "rows: 4" << endl;
+    MyFile << " " << "cols: 4" << endl;
+    MyFile << " " << "dt: f" << endl;
+    MyFile << " data: [" << right_camera_info.r[0] << "," <<  right_camera_info.r[1] << "," <<  right_camera_info.r[2] << "," <<  baseline << "," << endl;
+    MyFile << "     " << right_camera_info.r[3] << "," <<  right_camera_info.r[4] << "," <<  right_camera_info.r[5] << "," <<  0 << "," << endl;
+    MyFile << "     " << right_camera_info.r[6] << "," <<  right_camera_info.r[7] << "," <<  right_camera_info.r[8] << "," <<  0 << "," << endl;
+    MyFile << "     " << 0 << "," <<  0 << "," <<  0 << "," <<  1 << "]" << endl;
 
     MyFile.close();
 }
