@@ -17,6 +17,12 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
     std::string left_info_topic = "/left/image_raw";
     std::string right_info_topic = "/right/image_raw";
 
+    this->declare_parameter("orb_extractor_n_features", rclcpp::PARAMETER_INTEGER);
+    this->declare_parameter("orb_extractor_scale_factor", rclcpp::PARAMETER_DOUBLE);
+    this->declare_parameter("orb_extractor_n_levels", rclcpp::PARAMETER_INTEGER);
+    this->declare_parameter("orb_extractor_ini_th_fast", rclcpp::PARAMETER_INTEGER);
+    this->declare_parameter("orb_extractor_min_th_fast", rclcpp::PARAMETER_INTEGER);
+
     left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_image_topic);
     right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), right_image_topic);
     

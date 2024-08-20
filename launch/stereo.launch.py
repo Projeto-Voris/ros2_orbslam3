@@ -3,30 +3,43 @@ from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument as LaunchArg
 from launch.substitutions import LaunchConfiguration as LaunchConfig
 
+orb_parameters = {
+    'orb_extractor_n_features':1500,
+    'orb_extractor_scale_factor':1.2,
+    'orb_extractor_n_levels':8,
+    'orb_extractor_ini_th_fast':20,
+    'orb_extractor_min_th_fast':6,
+}
+
 def generate_launch_description():
+    
     return LaunchDescription([
-        LaunchArg(
-            'left_image',
-            default_value=['/left/image_raw']
-        ),
-        LaunchArg(
-            'right_image',
-            default_value=['/right/image_raw']
-        ),
-        LaunchArg(
-            'left_info',
-            default_value=['/left/camera_info']
-        ),
-        LaunchArg(
-            'right_info',
-            default_value=['/right/camera_info']
-        ),
+        LaunchArg( 'left_image', default_value=['/left/image_raw']),
+        LaunchArg( 'right_image', default_value=['/right/image_raw']),
+        LaunchArg( 'left_info', default_value=['/left/camera_info']),
+        LaunchArg( 'right_info', default_value=['/right/camera_info']),
+
+        LaunchArg( 'orb_extractor_n_features', default_value=['1500']),
+        LaunchArg( 'orb_extractor_scale_factor', default_value=['1.2']),
+        LaunchArg( 'orb_extractor_n_levels', default_value=['8']),
+        LaunchArg( 'orb_extractor_ini_th_fast',default_value=['20']),
+        LaunchArg( 'orb_extractor_min_th_fast',default_value=['6']),
+       
         Node(
             package='ros2_orbslam3',
             namespace='/sm2/debug',
             executable='stereo',
             name='stereo',
-            arguments= [["/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt"], ["/ws/src/ros2_orbslam3/config/stereo/CALIBRED22072024.yaml"],["True"]],
+            parameters=[orb_parameters],
+            arguments= [["/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt"],
+                        ["/ws/src/ros2_orbslam3/config/stereo/CALIBRED22072024.yaml"],
+                        ["True"], 
+                        [LaunchConfig('orb_extractor_n_features')],
+                        [LaunchConfig('orb_extractor_scale_factor')],
+                        [LaunchConfig('orb_extractor_n_levels')],
+                        [LaunchConfig('orb_extractor_ini_th_fast')],
+                        [LaunchConfig('orb_extractor_min_th_fast')]
+                        ],
             remappings=[
                 ('/left/image_raw',  LaunchConfig('left_image')),
                 ('/right/image_raw', LaunchConfig('right_image')),

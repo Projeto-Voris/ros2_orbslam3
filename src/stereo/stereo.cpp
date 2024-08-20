@@ -8,7 +8,8 @@
 
 #include"System.h"
 
-void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info);
+void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info, const string &orb_extractor_n_features, 
+    const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast);
 
 int main(int argc, char **argv)
 {
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
 
     if(left_camera_info_received && right_camera_info_received){
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Camera info received");
-        write_config_file(left_camera_info, right_camera_info);
+        write_config_file(left_camera_info, right_camera_info, argv[4], argv[5], argv[6], argv[7], argv[8]);
     }
 
     else
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
     const string path_to_vocabulary = "/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt";
     const string path_to_settings = "/ws/src/ros2_orbslam3/config/stereo/config.yaml";
 
-    ORB_SLAM3::System SLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, visualization);
+    ORB_SLAM3::System SLAM(argv[1], path_to_settings, ORB_SLAM3::System::STEREO, visualization);
 
     auto node = std::make_shared<StereoSlamNode>(&SLAM, argv[2], argv[3]);
 
@@ -61,14 +62,16 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info){
+void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info, const string &orb_extractor_n_features, 
+    const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast){
     
     ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
 
     MyFile << "%YAML:1.0" << endl;
-    MyFile << "File.version: '1.0'" << endl;
+    MyFile << "File.version: \"1.0\"" << endl;
 
-    MyFile << "Camera.type: '"<< left_camera_info.distortion_model <<"'"<< endl;
+    if(left_camera_info.distortion_model.compare("pinhole") == 0)
+        MyFile << "Camera.type: \"PinHole\""<< endl;
 
     MyFile << "Camera1.fx: " << left_camera_info.k[0] << endl;
     MyFile << "Camera1.fy: "<< left_camera_info.k[4] << endl;
@@ -106,6 +109,24 @@ void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msg
     MyFile << "     " << right_camera_info.r[3] << "," <<  right_camera_info.r[4] << "," <<  right_camera_info.r[5] << "," <<  0 << "," << endl;
     MyFile << "     " << right_camera_info.r[6] << "," <<  right_camera_info.r[7] << "," <<  right_camera_info.r[8] << "," <<  0 << "," << endl;
     MyFile << "     " << 0 << "," <<  0 << "," <<  0 << "," <<  1 << "]" << endl;
+
+    MyFile << "ORBextractor.nFeatures:" << orb_extractor_n_features.c_str() << endl;
+    MyFile << "ORBextractor.scaleFactor:" << orb_extractor_scale_factor.c_str() << endl;
+    MyFile << "ORBextractor.nLevels:" << orb_extractor_n_levels.c_str() << endl;
+    MyFile << "ORBextractor.iniThFAST:" << orb_extractor_ini_th_fast.c_str() << endl;
+    MyFile << "ORBextractor.minThFAST:" << orb_extractor_min_th_fast.c_str() << endl;
+
+    MyFile << "Viewer.KeyFrameSize: 0.05" << endl;
+    MyFile << "Viewer.KeyFrameLineWidth: 1.0" << endl;
+    MyFile << "Viewer.GraphLineWidth: 0.9" << endl;
+    MyFile << "Viewer.PointSize: 2.0" << endl;
+    MyFile << "Viewer.CameraSize: 0.08" << endl;
+    MyFile << "Viewer.CameraLineWidth: 3.0" << endl;
+    MyFile << "Viewer.ViewpointX: 0.0" << endl;
+    MyFile << "Viewer.ViewpointY: -0.7" << endl;
+    MyFile << "Viewer.ViewpointZ: -1.8" << endl;
+    MyFile << "Viewer.ViewpointF: 500.0" << endl;
+    MyFile << "Viewer.imageViewScale: 1.0" << endl;
 
     MyFile.close();
 }
