@@ -9,7 +9,8 @@
 #include"System.h"
 
 void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info, const string &orb_extractor_n_features, 
-    const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast);
+    const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast,
+    const string &stereo_th_depth);
 
 int main(int argc, char **argv)
 {
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
 
     if(left_camera_info_received && right_camera_info_received){
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Camera info received");
-        write_config_file(left_camera_info, right_camera_info, argv[4], argv[5], argv[6], argv[7], argv[8]);
+        write_config_file(left_camera_info, right_camera_info, argv[4], argv[5], argv[6], argv[7], argv[8], argv[9]);
     }
 
     else
@@ -63,7 +64,8 @@ int main(int argc, char **argv)
 }
 
 void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msgs::msg::CameraInfo right_camera_info, const string &orb_extractor_n_features, 
-    const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast){
+    const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast,
+    const string &stereo_th_depth){
     
     ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
 
@@ -98,6 +100,14 @@ void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msg
 
     MyFile << "Camera2.p1: "<< right_camera_info.d[3] << endl;
     MyFile << "Camera2.p2: "<< right_camera_info.d[4]  << endl;
+
+    MyFile << "Camera.width: "<< right_camera_info.width << endl;
+    MyFile << "Camera.height: "<< right_camera_info.height  << endl;
+
+    MyFile << "Camera.fps: 30" << endl;
+    MyFile << "Camera.RGB: 1" << endl;
+
+    MyFile << "Stereo.ThDepth:"<< stereo_th_depth.c_str()<< endl;
 
     float baseline = right_camera_info.p[3]/(-right_camera_info.p[0]);
 

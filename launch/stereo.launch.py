@@ -16,6 +16,7 @@ def generate_launch_description():
         LaunchArg( 'orb_extractor_n_levels', default_value=['8']),
         LaunchArg( 'orb_extractor_ini_th_fast',default_value=['20']),
         LaunchArg( 'orb_extractor_min_th_fast',default_value=['6']),
+        LaunchArg( 'stereo_th_depth',default_value=['8.0']),
        
         Node(
             package='ros2_orbslam3',
