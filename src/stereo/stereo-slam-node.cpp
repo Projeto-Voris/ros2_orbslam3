@@ -73,13 +73,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     sensor_msgs::msg::Image imgmsg;
     
 
-    cv::Mat resized_left;
-    cv::Mat resized_right;
-
-    cv::resize(cv_ptrLeft->image, resized_left, cv::Size(800,600));
-    cv::resize(cv_ptrRight->image, resized_right, cv::Size(800,600));
-
-    Sophus::SE3f SE3 = m_SLAM->TrackStereo(resized_left, resized_right, msgLeft->header.stamp.sec);
+    Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
     
     std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
 
