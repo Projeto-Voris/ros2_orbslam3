@@ -3,14 +3,6 @@ from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument as LaunchArg
 from launch.substitutions import LaunchConfiguration as LaunchConfig
 
-orb_parameters = {
-    'orb_extractor_n_features':1500,
-    'orb_extractor_scale_factor':1.2,
-    'orb_extractor_n_levels':8,
-    'orb_extractor_ini_th_fast':20,
-    'orb_extractor_min_th_fast':6,
-}
-
 def generate_launch_description():
     
     return LaunchDescription([
@@ -30,7 +22,6 @@ def generate_launch_description():
             namespace='/sm2/debug',
             executable='stereo',
             name='stereo',
-            parameters=[orb_parameters],
             arguments= [["/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt"],
                         ["/ws/src/ros2_orbslam3/config/stereo/CALIBRED22072024.yaml"],
                         ["True"], 
