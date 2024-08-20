@@ -109,15 +109,15 @@ void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msg
 
     MyFile << "Stereo.ThDepth:"<< stereo_th_depth.c_str()<< endl;
 
-    float baseline = right_camera_info.p[3]/(-right_camera_info.p[0]);
+    float baseline = right_camera_info.p[3];
 
     MyFile << "Stereo.T_c1_c2: !!opencv-matrix" << endl;
     MyFile << " " << "rows: 4" << endl;
     MyFile << " " << "cols: 4" << endl;
     MyFile << " " << "dt: f" << endl;
     MyFile << " data: [" << right_camera_info.r[0] << "," <<  right_camera_info.r[1] << "," <<  right_camera_info.r[2] << "," <<  baseline << "," << endl;
-    MyFile << "     " << right_camera_info.r[3] << "," <<  right_camera_info.r[4] << "," <<  right_camera_info.r[5] << "," <<  0 << "," << endl;
-    MyFile << "     " << right_camera_info.r[6] << "," <<  right_camera_info.r[7] << "," <<  right_camera_info.r[8] << "," <<  0 << "," << endl;
+    MyFile << "     " << right_camera_info.r[3] << "," <<  right_camera_info.r[4] << "," <<  right_camera_info.r[5] << "," <<  right_camera_info.p[7] << "," << endl;
+    MyFile << "     " << right_camera_info.r[6] << "," <<  right_camera_info.r[7] << "," <<  right_camera_info.r[8] << "," <<  right_camera_info.p[8] << "," << endl;
     MyFile << "     " << 0 << "," <<  0 << "," <<  0 << "," <<  1 << "]" << endl;
 
     MyFile << "ORBextractor.nFeatures:" << orb_extractor_n_features.c_str() << endl;
