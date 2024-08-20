@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/wait_for_message.hpp"
 
 #include "std_srvs/srv/trigger.hpp"
 
