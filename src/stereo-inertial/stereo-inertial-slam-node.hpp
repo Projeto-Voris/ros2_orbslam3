@@ -10,6 +10,7 @@
 #include "std_srvs/srv/trigger.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/msg/imu.hpp"
 
 #include "sensor_msgs/msg/camera_info.hpp"
 
