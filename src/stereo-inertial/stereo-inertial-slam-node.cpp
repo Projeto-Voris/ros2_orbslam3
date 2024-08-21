@@ -1,4 +1,4 @@
-#include "stereo-slam-node.hpp"
+#include "stereo-inertial-slam-node.hpp"
 
 #include<opencv2/core/core.hpp>
 #include<string>

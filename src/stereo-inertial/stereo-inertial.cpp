@@ -4,7 +4,7 @@
 #include<chrono>
 
 #include "rclcpp/rclcpp.hpp"
-#include "stereo-slam-node.hpp"
+#include "stereo-inertial-slam-node.hpp"
 
 #include"System.h"
 
