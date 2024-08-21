@@ -60,6 +60,8 @@ private:
     cv_bridge::CvImageConstPtr cv_ptrRight;
 
     sensor_msgs::msg::Imu::SharedPtr imu_message;
+    
+    std::vector<ORB_SLAM3::IMU::Point> vImu;
 
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > left_sub;
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > right_sub;

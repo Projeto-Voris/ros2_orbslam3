@@ -78,6 +78,8 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
                               msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
 
 
+    vImu.push_back(imuMeas);
+
     Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
     
     std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
