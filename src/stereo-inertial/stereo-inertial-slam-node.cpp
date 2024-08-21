@@ -13,12 +13,14 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
 {
     std::string left_image_topic = "/left/image_raw";
     std::string right_image_topic = "/right/image_raw";
+    std::string imu_topic = "imu/data_raw";
 
     std::string left_info_topic = "/left/image_raw";
     std::string right_info_topic = "/right/image_raw";
 
     left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_image_topic);
     right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), right_image_topic);
+    imu_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Imu> >(shared_ptr<rclcpp::Node>(this), imu_topic);
     
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
