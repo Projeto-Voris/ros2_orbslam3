@@ -74,6 +74,9 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     
     sensor_msgs::msg::Image imgmsg;
     
+    ORB_SLAM3::IMU::Point imuMeas(msgImu->linear_acceleration.x,msgImu->linear_acceleration.y,msgImu->linear_acceleration.z, 
+                              msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
+
 
     Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec);
     

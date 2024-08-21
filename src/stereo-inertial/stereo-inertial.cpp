@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     const string path_to_vocabulary = "/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt";
     const string path_to_settings = "/ws/src/ros2_orbslam3/config/stereo/config.yaml";
 
-    ORB_SLAM3::System SLAM(argv[1], path_to_settings, ORB_SLAM3::System::STEREO, visualization);
+    ORB_SLAM3::System SLAM(argv[1], path_to_settings, ORB_SLAM3::System::IMU_STEREO, visualization);
 
     auto node = std::make_shared<StereoSlamNode>(&SLAM, argv[2], argv[3]);
 
