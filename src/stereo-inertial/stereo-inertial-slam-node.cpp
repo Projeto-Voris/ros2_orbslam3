@@ -20,10 +20,12 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
 
     left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), left_image_topic);
     right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), right_image_topic);
-    imu_sub = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Imu> >(shared_ptr<rclcpp::Node>(this), imu_topic);
+    imu_sub = std::make_shared<message_filters::Subscriber<ImuMsg> >(shared_ptr<rclcpp::Node>(this), imu_topic);
     
-    syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub, *imu_sub);
+    syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
+    
+    imu_sub->registerCallback(&StereoSlamNode::GrabIMU, this);
 
 
 
@@ -41,7 +43,7 @@ StereoSlamNode::~StereoSlamNode()
     m_SLAM->Shutdown();
 }
 
-void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMsg::SharedPtr msgRight, const ImuMsg::SharedPtr msgImu)
+void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMsg::SharedPtr msgRight)
 {
 
     // Copy the ros rgb image message to cv::Mat.
@@ -73,14 +75,9 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     auto sendmsg = geometry_msgs::msg::TransformStamped();
     
     sensor_msgs::msg::Image imgmsg;
-    
-    ORB_SLAM3::IMU::Point imuMeas(msgImu->linear_acceleration.x,msgImu->linear_acceleration.y,msgImu->linear_acceleration.z, 
-                              msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
-
-
-    vImu.push_back(imuMeas);
 
     Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec, vImu);
+    vImu.clear();
     
     std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
 
@@ -170,6 +167,14 @@ void StereoSlamNode::PublishPointCloud(){
         memcpy(&pointcloudmsg.data[i*12 + 8], &z, 4);
     }
     pclpublisher->publish(pointcloudmsg);
+}
+
+void StereoSlamNode::GrabIMU(const ImuMsg::SharedPtr msgImu){
+    ORB_SLAM3::IMU::Point imuMeas(msgImu->linear_acceleration.x,msgImu->linear_acceleration.y,msgImu->linear_acceleration.z, 
+                              msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
+    vImu.push_back(imuMeas);
+    RCLCPP_INFO(this->get_logger(), "IMU received");
+    
 }
 
 void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res){
