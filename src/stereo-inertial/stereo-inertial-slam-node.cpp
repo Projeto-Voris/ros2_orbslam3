@@ -109,6 +109,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
         imgpublisher->publish(imgmsg);
     }
     publisher->publish(sendmsg);
+    //RCLCPP_INFO(this->get_logger(), "%d", vImu.size()); 
    
 }
 
@@ -173,7 +174,6 @@ void StereoSlamNode::GrabIMU(const ImuMsg::SharedPtr msgImu){
     ORB_SLAM3::IMU::Point imuMeas(msgImu->linear_acceleration.x,msgImu->linear_acceleration.y,msgImu->linear_acceleration.z, 
                               msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
     vImu.push_back(imuMeas);
-    
 }
 
 void StereoSlamNode::SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res){
