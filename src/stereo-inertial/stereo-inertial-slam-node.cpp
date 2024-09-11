@@ -13,7 +13,7 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
 {
     std::string left_image_topic = "/left/image_raw";
     std::string right_image_topic = "/right/image_raw";
-    std::string imu_topic = "imu/data_raw";
+    std::string imu_topic = "/imu/data_raw";
 
     std::string left_info_topic = "/left/image_raw";
     std::string right_info_topic = "/right/image_raw";
@@ -173,7 +173,6 @@ void StereoSlamNode::GrabIMU(const ImuMsg::SharedPtr msgImu){
     ORB_SLAM3::IMU::Point imuMeas(msgImu->linear_acceleration.x,msgImu->linear_acceleration.y,msgImu->linear_acceleration.z, 
                               msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
     vImu.push_back(imuMeas);
-    RCLCPP_INFO(this->get_logger(), "IMU received");
     
 }
 

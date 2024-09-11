@@ -67,7 +67,7 @@ void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msg
     const string &orb_extractor_scale_factor , const string &orb_extractor_n_levels, const string &orb_extractor_ini_th_fast, const string &orb_extractor_min_th_fast,
     const string &stereo_th_depth){
     
-    ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo/config.yaml");
+    ofstream MyFile("/ws/src/ros2_orbslam3/config/stereo-inertial/config.yaml");
 
     MyFile << "%YAML:1.0" << endl;
     MyFile << "File.version: \"1.0\"" << endl;
@@ -120,21 +120,22 @@ void write_config_file(sensor_msgs::msg::CameraInfo left_camera_info, sensor_msg
     MyFile << "     " << right_camera_info.r[6] << "," <<  right_camera_info.r[7] << "," <<  right_camera_info.r[8] << "," <<  right_camera_info.p[8] << "," << endl;
     MyFile << "     " << 0 << "," <<  0 << "," <<  0 << "," <<  1 << "]" << endl;
 
-    MyFile << "Stereo.T_c1_c2: !!opencv-matrix" << endl;
+    MyFile << "IMU.NoiseGyro: 0.00014384629116236022" << endl;
+    MyFile << "IMU.NoiseAcc: 0.0022805084626578718 # 2.0000e-3" << endl;
+    MyFile << "IMU.GyroWalk: 6.647710518330512e-07" << endl;
+    MyFile << "IMU.AccWalk: 5.8837296526825724e-05 # 3.0000e-3" << endl;
+    MyFile << "IMU.Frequency: 200.0" << endl;
+    
+    MyFile << "IMU.T_b_c1: !!opencv-matrix" << endl;
     MyFile << " " << "rows: 4" << endl;
     MyFile << " " << "cols: 4" << endl;
     MyFile << " " << "dt: f" << endl;
-    MyFile << " data: " << "[0.0148655429818, -0.999880929698, 0.00414029679422, -0.0216401454975," <<endl;
-    MyFile <<"     0.999557249008, 0.0149672133247, 0.025715529948, -0.064676986768," << endl;
-    MyFile <<"     -0.0257744366974, 0.00375618835797, 0.999660727178, 0.00981073058949, "<< endl;
-    MyFile <<"     0.0, 0.0, 0.0, 1.0] "<< endl;
+    MyFile << " data: [" << -0.011235092332746804 << "," <<  0.9998907174198297 << "," <<  0.009608637672980591 << "," <<  0.05320347142186549 << "," << endl;
+    MyFile << "     " << 0.0006083771798949811 << "," <<  0.009616077677691182 << "," <<  -0.999953579386214 << "," <<  -0.0007188769018119753 << "," << endl;
+    MyFile << "     " << -0.9999366992852495 << "," <<  -0.011228725116974647 << "," <<  -0.0007163482154548262 << "," <<  -0.06763835411845474 << "," << endl;
+    MyFile << "     " << 0 << "," <<  0 << "," <<  0 << "," <<  1 << "]" << endl;
 
-    MyFile << "IMU.NoiseGyro: 1.7e-04" << endl;
-    MyFile << "IMU.NoiseAcc: 2.0e-03 # 2.0000e-3" << endl;
-    MyFile << "IMU.GyroWalk: 1.9393e-05" << endl;
-    MyFile << "IMU.AccWalk: 3.e-03 # 3.0000e-3" << endl;
-    MyFile << "IMU.Frequency: 200.0" << endl;
-    
+
     MyFile << "ORBextractor.nFeatures:" << orb_extractor_n_features.c_str() << endl;
     MyFile << "ORBextractor.scaleFactor:" << orb_extractor_scale_factor.c_str() << endl;
     MyFile << "ORBextractor.nLevels:" << orb_extractor_n_levels.c_str() << endl;

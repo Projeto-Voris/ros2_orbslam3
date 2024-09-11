@@ -54,15 +54,15 @@ ament_target_dependencies(stereo rclcpp sensor_msgs geometry_msgs cv_bridge mess
         ORB_SLAM3
         Pangolin)
 
-add_executable(stereo-inertial
+add_executable(stereo_inertial
         src/stereo-inertial/stereo-inertial.cpp
         src/stereo-inertial/stereo-inertial-slam-node.cpp
 )
-ament_target_dependencies(stereo-inertial rclcpp sensor_msgs geometry_msgs cv_bridge message_filters std_srvs
+ament_target_dependencies(stereo_inertial rclcpp sensor_msgs geometry_msgs cv_bridge message_filters std_srvs
         ORB_SLAM3
         Pangolin)
 
-install(TARGETS mono rgbd stereo DESTINATION lib/${PROJECT_NAME})
+install(TARGETS mono rgbd stereo stereo_inertial DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 ament_package()
