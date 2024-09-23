@@ -1,5 +1,4 @@
-#ifndef __STEREO_SLAM_NODE_HPP__
-#define __STEREO_SLAM_NODE_HPP__
+
 
 #include <iostream>
 #include <fstream>
@@ -34,15 +33,12 @@
 
 
 
-class StereoSlamNode : public rclcpp::Node
+class CameraSyncNode : public rclcpp::Node
 {
 public:
-    StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify);
+    CameraSyncNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify);
 
-    ~StereoSlamNode();
-
-    void SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res);
-    void PublishPointCloud();
+    ~CameraSyncNode();
     
 
 private: 
@@ -51,10 +47,6 @@ private:
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image, sensor_msgs::msg::Image> approximate_sync_policy;
 
     void GrabStereo(const sensor_msgs::msg::Image::SharedPtr msgRGB, const sensor_msgs::msg::Image::SharedPtr msgD);
-    void GrabIMU(const ImuMsg::SharedPtr msgImu);
-    void TimerCallback();
-    
-    ORB_SLAM3::System* m_SLAM;
 
     bool doRectify;
     cv::Mat M1l,M2l,M1r,M2r;
@@ -62,25 +54,13 @@ private:
     cv_bridge::CvImageConstPtr cv_ptrLeft;
     cv_bridge::CvImageConstPtr cv_ptrRight;
 
-    sensor_msgs::msg::Imu::SharedPtr imu_message;
-    
-    std::vector<ORB_SLAM3::IMU::Point> vImu;
 
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > left_sub;
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > right_sub;
 
-    std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Imu> > imu_sub;
-    rclcpp::TimerBase::SharedPtr timer_;
-
     std::shared_ptr<message_filters::Synchronizer<approximate_sync_policy> > syncApproximate;
 
-    rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr publisher;
-    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pclpublisher;
+    
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr imgpublisher;
-
-    rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr save_pcl_srv;
-    rclcpp::CallbackGroup::SharedPtr sub_cb_group_;
-    rclcpp::CallbackGroup::SharedPtr timer_cb_group_;
 };
 
-#endif
