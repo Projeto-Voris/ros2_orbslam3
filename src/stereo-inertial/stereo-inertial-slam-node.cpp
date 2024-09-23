@@ -23,7 +23,7 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
     auto image_options = rclcpp::SubscriptionOptions();
     image_options.callback_group = sub_cb_group_;
 
-    image_sub = this->create_subscription<sensor_msgs::msg::Image>(image_topic, 10, std::bind(&StereoSlamNode::GrabStereo, this, _1));
+    image_sub = this->create_subscription<sensor_msgs::msg::Image>(image_topic, 10, std::bind(&StereoSlamNode::GrabStereo, this, _1), image_options);
     
     imu_sub = this->create_subscription<ImuMsg>(imu_topic,10, std::bind(&StereoSlamNode::GrabIMU, this, _1));
 
