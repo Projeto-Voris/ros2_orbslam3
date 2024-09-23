@@ -23,7 +23,7 @@ def generate_launch_description():
         Node(
             package='ros2_orbslam3',
             namespace='/sm2/sync',
-            executable='camera-sync',
+            executable='camera_sync',
             name='camera_sync'
         )
 
