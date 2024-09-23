@@ -4,7 +4,7 @@
 #include<chrono>
 
 #include "rclcpp/rclcpp.hpp"
-#include "stereo-inertial-slam-node.hpp"
+#include "camera-sync-node.hpp"
 
 
 

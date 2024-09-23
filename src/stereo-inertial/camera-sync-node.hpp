@@ -25,18 +25,13 @@
 
 #include <cv_bridge/cv_bridge.h>
 
-#include "System.h"
-#include "Frame.h"
-#include "Map.h"
-#include "Tracking.h"
-#include "MapPoint.h"
 
 
 
 class CameraSyncNode : public rclcpp::Node
 {
 public:
-    CameraSyncNode(ORB_SLAM3::System* pSLAM, const string &strSettingsFile, const string &strDoRectify);
+    CameraSyncNode();
 
     ~CameraSyncNode();
     
