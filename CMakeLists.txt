@@ -60,7 +60,7 @@ add_executable(camera_sync
 )
 
 ament_target_dependencies(camera_sync rclcpp sensor_msgs cv_bridge message_filters )       
-#[===[
+
 add_executable(stereo_inertial
         src/stereo-inertial/stereo-inertial.cpp
         src/stereo-inertial/stereo-inertial-slam-node.cpp
@@ -68,8 +68,8 @@ add_executable(stereo_inertial
 ament_target_dependencies(stereo_inertial rclcpp sensor_msgs geometry_msgs cv_bridge message_filters std_srvs
         ORB_SLAM3
         Pangolin)
-]===]
-install(TARGETS mono rgbd stereo #[===[stereo_inertial]===] camera_sync DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS mono rgbd stereo stereo_inertial camera_sync DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 ament_package()

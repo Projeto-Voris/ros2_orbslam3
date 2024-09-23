@@ -23,13 +23,9 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
     auto image_options = rclcpp::SubscriptionOptions();
     image_options.callback_group = sub_cb_group_;
 
-    image_sub = this->create_subscription<std_msgs::msg::String>(image_topic, 10, std::bind(&MinimalSubscriber::GrabStereo, this, _1));
+    image_sub = this->create_subscription<sensor_msgs::msg::Image>(image_topic, 10, std::bind(&StereoSlamNode::GrabStereo, this, _1));
     
-    imu_sub = std::make_shared<message_filters::Subscriber<ImuMsg> >(shared_ptr<rclcpp::Node>(this), imu_topic);
-    
-    imu_sub->registerCallback(&StereoSlamNode::GrabIMU, this);
-
-    timer_ = this->create_wall_timer(4ms, std::bind(&StereoSlamNode::TimerCallback, this), timer_cb_group_);
+    imu_sub = this->create_subscription<ImuMsg>(imu_topic,10, std::bind(&StereoSlamNode::GrabIMU, this, _1));
 
     publisher = this->create_publisher<geometry_msgs::msg::TransformStamped>("transform", 10);
     pclpublisher = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud", 10);
@@ -45,25 +41,14 @@ StereoSlamNode::~StereoSlamNode()
     m_SLAM->Shutdown();
 }
 
-void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMsg::SharedPtr msgRight)
+void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
 {
 
     RCLCPP_INFO(this->get_logger(), "Image received"); 
     // Copy the ros rgb image message to cv::Mat.
     try
     {
-         cv_ptrLeft = cv_bridge::toCvShare(msgLeft); 
-    }
-    catch (cv_bridge::Exception& e)
-    {
-        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
-        return;
-    }
-
-    // Copy the ros depth image message to cv::Mat.
-    try
-    {
-        cv_ptrRight = cv_bridge::toCvShare(msgRight);
+         cv_ptrImage = cv_bridge::toCvShare(msgImage); 
     }
     catch (cv_bridge::Exception& e)
     {
@@ -79,8 +64,15 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     
     sensor_msgs::msg::Image imgmsg;
     
+
     RCLCPP_INFO(this->get_logger(), "%d", vImu.size());
-    Sophus::SE3f SE3 = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, msgLeft->header.stamp.sec, vImu);
+
+    cv::Mat cropLeft, cropRight;
+
+    cropLeft = cv_ptrImage->image(cv::Range(0, msgImage->width/2), cv::Range(0, msgImage->height));
+    cropRight = cv_ptrImage->image(cv::Range(msgImage->width/2, msgImage->width), cv::Range(0, msgImage->height));
+
+    Sophus::SE3f SE3 = m_SLAM->TrackStereo(cropLeft, cropRight, msgImage->header.stamp.sec, vImu);
     vImu.clear();
     
     /*std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
