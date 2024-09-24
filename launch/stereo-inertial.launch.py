@@ -25,6 +25,29 @@ def generate_launch_description():
             namespace='/sm2/sync',
             executable='camera_sync',
             name='camera_sync'
+        ),
+        Node(
+            package='ros2_orbslam3',
+            namespace='/sm2/debug',
+            executable='stereo_inertial',
+            name='stereo_inertial',
+            arguments= [["/ws/src/ros2_orbslam3/vocabulary/ORBvoc.txt"],
+                        ["/ws/src/ros2_orbslam3/config/stereo/CALIBRED22072024.yaml"],
+                        ["True"], 
+                        [LaunchConfig('orb_extractor_n_features')],
+                        [LaunchConfig('orb_extractor_scale_factor')],
+                        [LaunchConfig('orb_extractor_n_levels')],
+                        [LaunchConfig('orb_extractor_ini_th_fast')],
+                        [LaunchConfig('orb_extractor_min_th_fast')],
+                        [LaunchConfig('stereo_th_depth')]
+                        ],
+            remappings=[
+                ('/left/image_raw',  LaunchConfig('left_image')),
+                ('/right/image_raw', LaunchConfig('right_image')),
+                ('/left/camera_info', LaunchConfig('left_info')),
+                ('/right/camera_info', LaunchConfig('right_info')),
+                ('/imu/data_raw', LaunchConfig('imu_data'))
+            ]
         )
 
     ])

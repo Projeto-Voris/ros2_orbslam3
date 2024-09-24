@@ -11,10 +11,9 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
 :   Node("orbslam"),
     m_SLAM(pSLAM)
 {
-    sub_cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-    timer_cb_group_ = nullptr;
+    sub_cb_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 
-    std::string image_topic = "/image/image_raw";
+    std::string image_topic = "/sm2/sync/img";
     std::string imu_topic = "/imu/data_raw";
 
     std::string left_info_topic = "/left/image_raw";
@@ -43,19 +42,11 @@ StereoSlamNode::~StereoSlamNode()
 
 void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
 {
-
-    RCLCPP_INFO(this->get_logger(), "Image received"); 
     // Copy the ros rgb image message to cv::Mat.
     try
     {
          cv_ptrImage = cv_bridge::toCvShare(msgImage); 
     }
-    catch (cv_bridge::Exception& e)
-    {
-        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
-        return;
-    }
-
     cv::Mat Tcw;
     cv::Mat imKey;
     bool debug = false;
@@ -65,20 +56,30 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
     sensor_msgs::msg::Image imgmsg;
     
 
-    RCLCPP_INFO(this->get_logger(), "%d", vImu.size());
+    
 
     cv::Mat cropLeft, cropRight;
 
-    cropLeft = cv_ptrImage->image(cv::Range(0, msgImage->width/2), cv::Range(0, msgImage->height));
-    cropRight = cv_ptrImage->image(cv::Range(msgImage->width/2, msgImage->width), cv::Range(0, msgImage->height));
+    int width = cv_ptrImage->image.cols;
+    int height = cv_ptrImage->image.rows;
+    cropLeft = cv_ptrImage->image(cv::Range(0, height),cv::Range(0, width/2));
+    cropRight = cv_ptrImage->image(cv::Range(0, height), cv::Range(width/2, width));
+    if(!vImu.empty()){
+        Sophus::SE3f SE3 = m_SLAM->TrackStereo(cropLeft, cropRight, msgImage->header.stamp.sec);
+        RCLCPP_INFO(this->get_logger(), "Imu vector size: %d", vImu.size());
+        vImu.clear();
+    }
+    catch (cv_bridge::Exception& e)
+    {
+        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+        return;
+    }
 
-    Sophus::SE3f SE3 = m_SLAM->TrackStereo(cropLeft, cropRight, msgImage->header.stamp.sec, vImu);
-    vImu.clear();
     
-    /*std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();
+    /*std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();*/
 
     
-    cv_bridge::CvImage img_bridge;
+    /*cv_bridge::CvImage img_bridge;
     sensor_msgs::msg::Image img_msg;
 
     sendmsg.header.stamp = msgLeft->header.stamp;
@@ -170,14 +171,14 @@ void StereoSlamNode::GrabIMU(const ImuMsg::SharedPtr msgImu){
     ORB_SLAM3::IMU::Point lastImuMeas(msgImu->linear_acceleration.x,msgImu->linear_acceleration.y,msgImu->linear_acceleration.z, 
                               msgImu->angular_velocity.x, msgImu->angular_velocity.y, msgImu->angular_velocity.z, msgImu->header.stamp.sec);
     vImu.push_back(lastImuMeas);
-    RCLCPP_INFO(this->get_logger(), "IMU received"); 
+    //RCLCPP_INFO(this->get_logger(), "Imu vector size: %d", vImu.size());
     
 }
 
 void StereoSlamNode::TimerCallback(){
-    ORB_SLAM3::IMU::Point lastImuMeas(imu_message->linear_acceleration.x,imu_message->linear_acceleration.y,imu_message->linear_acceleration.z, 
+    /*ORB_SLAM3::IMU::Point lastImuMeas(imu_message->linear_acceleration.x,imu_message->linear_acceleration.y,imu_message->linear_acceleration.z, 
                               imu_message->angular_velocity.x, imu_message->angular_velocity.y, imu_message->angular_velocity.z, imu_message->header.stamp.sec);
-    vImu.push_back(lastImuMeas);
+    vImu.push_back(lastImuMeas);*/
      
 }
 

@@ -44,6 +44,7 @@ public:
     void SavePointCloudSRV(std_srvs::srv::Trigger::Request::SharedPtr req, std_srvs::srv::Trigger::Response::SharedPtr res);
     void PublishPointCloud();
     
+    std::vector<ORB_SLAM3::IMU::Point> vImu;
 
 private: 
     using ImageMsg = sensor_msgs::msg::Image;
@@ -62,8 +63,8 @@ private:
     cv_bridge::CvImageConstPtr cv_ptrImage;
 
     sensor_msgs::msg::Imu::SharedPtr imu_message;
+    int count;
     
-    std::vector<ORB_SLAM3::IMU::Point> vImu;
 
     std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Image> > image_sub;
     std::shared_ptr<rclcpp::Subscription<sensor_msgs::msg::Imu> > imu_sub;
