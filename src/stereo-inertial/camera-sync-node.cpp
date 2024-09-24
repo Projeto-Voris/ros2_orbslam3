@@ -63,6 +63,8 @@ void CameraSyncNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
     
     sensor_msgs::msg::Image msg;
     cv_bridge::CvImage(std_msgs::msg::Header(), msgLeft->encoding, out).toImageMsg(msg);
+    msg.header.stamp.sec = msgLeft->header.stamp.sec;
+    msg.header.stamp.nanosec = msgLeft->header.stamp.nanosec;
 
 
     imgpublisher->publish(msg);

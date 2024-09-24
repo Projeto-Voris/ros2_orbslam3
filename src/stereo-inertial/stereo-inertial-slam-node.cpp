@@ -47,6 +47,11 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
     {
          cv_ptrImage = cv_bridge::toCvShare(msgImage); 
     }
+    catch (cv_bridge::Exception& e)
+    {
+        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+        return;
+    }
     cv::Mat Tcw;
     cv::Mat imKey;
     bool debug = false;
@@ -68,35 +73,31 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
         Sophus::SE3f SE3 = m_SLAM->TrackStereo(cropLeft, cropRight, msgImage->header.stamp.sec);
         RCLCPP_INFO(this->get_logger(), "Imu vector size: %d", vImu.size());
         vImu.clear();
-    }
-    catch (cv_bridge::Exception& e)
-    {
-        RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
-        return;
+        
+        cv_bridge::CvImage img_bridge;
+        sensor_msgs::msg::Image img_msg;
+
+        sendmsg.header.stamp = msgImage->header.stamp;
+        sendmsg.header.frame_id = "base_link";
+        sendmsg.child_frame_id = "sm2_left_cam_link";
+
+        sendmsg.transform.translation.x = SE3.params()(4);
+        sendmsg.transform.translation.y = SE3.params()(5);
+        sendmsg.transform.translation.z = SE3.params()(6);
+
+        sendmsg.transform.rotation.x = SE3.params()(0);
+        sendmsg.transform.rotation.y = SE3.params()(1);
+        sendmsg.transform.rotation.z = SE3.params()(2);
+        sendmsg.transform.rotation.w = SE3.params()(3);
+        publisher->publish(sendmsg);
     }
 
     
     /*std::vector<cv::KeyPoint> keypoints = m_SLAM->GetTrackedKeyPointsUn();*/
 
-    
-    /*cv_bridge::CvImage img_bridge;
-    sensor_msgs::msg::Image img_msg;
-
-    sendmsg.header.stamp = msgLeft->header.stamp;
-    sendmsg.header.frame_id = "base_link";
-    sendmsg.child_frame_id = "sm2_left_cam_link";
-
-    sendmsg.transform.translation.x = SE3.params()(4);
-    sendmsg.transform.translation.y = SE3.params()(5);
-    sendmsg.transform.translation.z = SE3.params()(6);
-
-    sendmsg.transform.rotation.x = SE3.params()(0);
-    sendmsg.transform.rotation.y = SE3.params()(1);
-    sendmsg.transform.rotation.z = SE3.params()(2);
-    sendmsg.transform.rotation.w = SE3.params()(3);
 
     
-    if(debug){
+    /*if(debug){
 
         PublishPointCloud();
         
@@ -104,8 +105,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
         cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", imKey).toImageMsg(imgmsg);
 
         imgpublisher->publish(imgmsg);
-    }
-    publisher->publish(sendmsg);*/
+    }*/
     
    
 }
