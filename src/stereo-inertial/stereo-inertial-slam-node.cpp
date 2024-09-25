@@ -77,7 +77,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
         //cv::imshow("Image", cropRight);
         //cv::waitKey(1);
         
-        /*cv_bridge::CvImage img_bridge;
+        cv_bridge::CvImage img_bridge;
         sensor_msgs::msg::Image img_msg;
 
         sendmsg.header.stamp = msgImage->header.stamp;
@@ -92,7 +92,7 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgImage)
         sendmsg.transform.rotation.y = SE3.params()(1);
         sendmsg.transform.rotation.z = SE3.params()(2);
         sendmsg.transform.rotation.w = SE3.params()(3);
-        publisher->publish(sendmsg);*/
+        publisher->publish(sendmsg);
     }
 
     
